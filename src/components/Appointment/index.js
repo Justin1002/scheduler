@@ -40,6 +40,7 @@ function save(name, interviewer) {
 function confirmDeletion() {
   transition(CONFIRM)
 }
+
 function deleteInterview() {
   transition(DELETE,true)
   props.cancelInterview(props.id)
