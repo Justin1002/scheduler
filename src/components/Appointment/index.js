@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Header from "./Header"
 import Show from "./Show"
 import Empty from "./Empty"
@@ -54,14 +54,13 @@ function editInterview() {
 }
 
 
-
 // {props.interview ? <Show student={props.interview.student} interviewer={props.interview.interviewer}/> : <Empty/>}
 
   return (
     <article className="appointment">
       <Header time={props.time} />
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
-      {mode === SHOW && (<Show student={props.interview.student} interviewer={props.interview.interviewer} onDelete={confirmDeletion} onEdit={editInterview} />)}
+      {mode === SHOW && props.interview && (<Show student={props.interview.student} interviewer={props.interview.interviewer} onDelete={confirmDeletion} onEdit={editInterview} />)}
       {mode === CREATE && (<Form name={props.name} interviewer={props.interviewer} interviewers={props.interviewers} onCancel={back} onSave={save} />)}
       {mode === SAVING && (<Status message="Saving" />)}
       {mode === DELETE && (<Status message="Deleting" />)}

@@ -11,7 +11,7 @@ export default function useApplicationData() {
   function reducer(state, action) {
     
     switch(action.type) {
-      
+
       case SET_DAY:
         return {
           ...state,
@@ -93,7 +93,43 @@ export default function useApplicationData() {
         days, appointments, interviewers
       })
     })
+
   },[])
+
+  const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+  
+  useEffect(() => {
+   
+      webSocket.onopen = () => {
+      console.log("web socket opened")
+      webSocket.send("ping")
+    }
+
+    webSocket.onmessage = function (event) {
+
+      const appointmentData = JSON.parse(event.data)
+
+      if(appointmentData.type ==="SET_INTERVIEW") {
+        
+        const id = appointmentData.id;
+        const interview = appointmentData.interview;
+
+        const appointment = {
+          ...state.appointments[id],
+          interview: interview? {...interview} : null
+        };
+
+        const appointments = {
+          ...state.appointments,
+          [id]: appointment
+        }
+
+        dispatch({type: SET_INTERVIEW, appointments})
+      }
+    }
+
+    return ()=>{webSocket.close()};
+  },[webSocket])
   
 
   function bookInterview(id, interview) {
@@ -102,12 +138,13 @@ export default function useApplicationData() {
       ...state.appointments[id],
       interview: { ...interview }
     };
- 
+    console.log('bookinterview_state',state)
     const appointments = {
       ...state.appointments,
       [id]: appointment
     };
     
+    console.log("bookInterview:",appointments)
     return axios.put(`http://localhost:8001/api/appointments/${id}`, appointment)
       .then(res => {
         dispatch({type: SET_INTERVIEW, appointments})
