@@ -130,7 +130,7 @@ export default function useApplicationData() {
     }
 
     return ()=>{webSocket.close()};
-  },[webSocket, state.appointments])
+  },[webSocket,state.appointments])
   
 
   function bookInterview(id, interview) {
