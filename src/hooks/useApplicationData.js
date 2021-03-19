@@ -96,43 +96,43 @@ export default function useApplicationData() {
 
   },[]);
 
-  const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+  // const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
   
-  useEffect(() => {
+  // useEffect(() => {
       
-    webSocket.onopen = () => {
-      console.log("web socket opened");
-      webSocket.send("ping");
-    };
+  //   webSocket.onopen = () => {
+  //     console.log("web socket opened");
+  //     webSocket.send("ping");
+  //   };
 
-    webSocket.onmessage = function(event) {
+  //   webSocket.onmessage = function(event) {
 
-      const appointmentData = JSON.parse(event.data);
+  //     const appointmentData = JSON.parse(event.data);
 
-      if (appointmentData.type === "SET_INTERVIEW") {
+  //     if (appointmentData.type === "SET_INTERVIEW") {
         
-        const id = appointmentData.id;
-        const interview = appointmentData.interview;
+  //       const id = appointmentData.id;
+  //       const interview = appointmentData.interview;
 
-        const appointment = {
-          ...state.appointments[id],
-          interview: interview ? {...interview} : null
-        };
+  //       const appointment = {
+  //         ...state.appointments[id],
+  //         interview: interview ? {...interview} : null
+  //       };
 
-        const appointments = {
-          ...state.appointments,
-          [id]: appointment
-        };
+  //       const appointments = {
+  //         ...state.appointments,
+  //         [id]: appointment
+  //       };
 
-        dispatch({type:SET_INTERVIEW, appointments});
-        dispatch({type:UPDATE_SPOTS});
-      }
-    };
+  //       dispatch({type:SET_INTERVIEW, appointments});
+  //       dispatch({type:UPDATE_SPOTS});
+  //     }
+  //   };
 
-    return ()=>{
-      webSocket.close();
-    };
-  },[webSocket,state.appointments]);
+  //   return ()=>{
+  //     webSocket.close();
+  //   };
+  // },[webSocket,state.appointments]);
   
 
   function bookInterview(id, interview) {

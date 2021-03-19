@@ -53,14 +53,14 @@ export default function Appointment(props) {
     transition(EDIT);
   }
 
-  useEffect(() => {
-    if (props.interview && mode === EMPTY) {
-      transition(SHOW);
-    }
-    if (!props.interview && mode === SHOW) {
-      transition(EMPTY);
-    }
-  },[props.interview,transition,mode]);
+  // useEffect(() => {
+  //   if (props.interview && mode === EMPTY) {
+  //     transition(SHOW);
+  //   }
+  //   if (!props.interview && mode === SHOW) {
+  //     transition(EMPTY);
+  //   }
+  // },[props.interview,transition,mode]);
 
 
   // {props.interview ? <Show student={props.interview.student} interviewer={props.interview.interviewer}/> : <Empty/>}
