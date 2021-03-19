@@ -99,7 +99,7 @@ export default function useApplicationData() {
   const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
   
   useEffect(() => {
-   
+      
       webSocket.onopen = () => {
       console.log("web socket opened")
       webSocket.send("ping")
@@ -124,12 +124,13 @@ export default function useApplicationData() {
           [id]: appointment
         }
 
-        dispatch({type: SET_INTERVIEW, appointments})
+        dispatch({type:SET_INTERVIEW, appointments})
+        dispatch({type:UPDATE_SPOTS})
       }
     }
 
     return ()=>{webSocket.close()};
-  },[webSocket])
+  },[webSocket, state.appointments])
   
 
   function bookInterview(id, interview) {
