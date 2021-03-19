@@ -113,7 +113,7 @@ export default function useApplicationData() {
         
         const id = appointmentData.id;
         const interview = appointmentData.interview;
-
+        
         const appointment = {
           ...state.appointments[id],
           interview: interview ? {...interview} : null
