@@ -46,23 +46,26 @@ export default function useApplicationData() {
   }
 
   function spotsRemaining(currentState) {
+    //create copies of the state, declare variables
     let currentDay = {};
-    let daysCopy = currentState.days;
-    let appointmentsCopy = currentState.appointments;
-    let count = 5;
+    let daysCopy = [...currentState.days];
+    let appointmentsCopy = {...currentState.appointments};
+    let count;
+    //loop through dayItem, and update the spots for each day
     for (const dayItem of daysCopy) {
-      if (currentState.day === dayItem.name) {
-        currentDay = {...dayItem};
-        for (const appointmentID of currentDay.appointments) {
-          if (appointmentsCopy[appointmentID].interview !== null) {
-            count--;
-          }
+      //establish initial available spots from day object, and establish currentDay
+      count = dayItem.appointments.length;
+      currentDay = {...dayItem};
+      //check which appointments currently do not have an appointment
+      for (const ID of currentDay.appointments) {
+        if (appointmentsCopy[ID].interview !== null) {
+          count--;
         }
       }
+      //update currentDay with spots, update the days array at the index with the new spot count
+      currentDay.spots = count;
+      daysCopy[currentDay.id - 1] = currentDay;
     }
-    currentDay.spots = count;
-    daysCopy[currentDay.id - 1] = currentDay;
-    
     return daysCopy;
   }
 
@@ -77,7 +80,7 @@ export default function useApplicationData() {
   const setDay = day => dispatch({type:SET_DAY, day});
 
   useEffect(() => {
-
+    
     Promise.all([
       axios.get('http://localhost:8001/api/days'),
       axios.get('http://localhost:8001/api/appointments'),
@@ -106,7 +109,7 @@ export default function useApplicationData() {
     };
 
     webSocket.onmessage = function(event) {
-
+      console.log('message recieved')
       const appointmentData = JSON.parse(event.data);
 
       if (appointmentData.type === "SET_INTERVIEW") {
@@ -124,8 +127,9 @@ export default function useApplicationData() {
           [id]: appointment
         };
 
-        dispatch({type:SET_INTERVIEW, appointments});
+        dispatch({type:SET_INTERVIEW, appointments})
         dispatch({type:UPDATE_SPOTS});
+        
       }
     };
 
