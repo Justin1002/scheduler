@@ -1,70 +1,14 @@
 import { useReducer, useEffect } from "react";
 import axios from "axios";
 
+import reducer, {
+  SET_DAY,
+  SET_APPLICATION_DATA,
+  SET_INTERVIEW,
+  UPDATE_SPOTS,
+} from "reducers/application";
+
 export default function useApplicationData() {
-
-  const SET_DAY = "SET_DAY";
-  const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
-  const SET_INTERVIEW = "SET_INTERVIEW";
-  const UPDATE_SPOTS = "UPDATE_SPOTS";
-
-  function reducer(state, action) {
-    
-    switch (action.type) {
-
-    case SET_DAY:
-      return {
-        ...state,
-        day: action.day
-      };
-
-    case SET_APPLICATION_DATA:
-      return {
-        ...state,
-        days: action.days,
-        appointments: action.appointments,
-        interviewers: action.interviewers
-      };
-
-    case SET_INTERVIEW: {
-      return {
-        ...state, appointments: action.appointments
-      };
-    }
-
-    case UPDATE_SPOTS: {
-      return {
-        ...state, days: spotsRemaining(state)
-      };
-    }
-
-    default:
-      throw new Error(
-        `Tried to reduce with unsupported action type: ${action.type}`
-      );
-    }
-  }
-
-  function spotsRemaining(currentState) {
-    let currentDay = {};
-    let daysCopy = currentState.days;
-    let appointmentsCopy = currentState.appointments;
-    let count = 5;
-    for (const dayItem of daysCopy) {
-      if (currentState.day === dayItem.name) {
-        currentDay = {...dayItem};
-        for (const appointmentID of currentDay.appointments) {
-          if (appointmentsCopy[appointmentID].interview !== null) {
-            count--;
-          }
-        }
-      }
-    }
-    currentDay.spots = count;
-    daysCopy[currentDay.id - 1] = currentDay;
-    
-    return daysCopy;
-  }
 
   const [state,dispatch] = useReducer(reducer, {
     day: "Monday",
@@ -77,7 +21,7 @@ export default function useApplicationData() {
   const setDay = day => dispatch({type:SET_DAY, day});
 
   useEffect(() => {
-
+    
     Promise.all([
       axios.get('http://localhost:8001/api/days'),
       axios.get('http://localhost:8001/api/appointments'),
@@ -96,43 +40,44 @@ export default function useApplicationData() {
 
   },[]);
 
-  // const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+  const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
   
-  // useEffect(() => {
+  useEffect(() => {
       
-  //   webSocket.onopen = () => {
-  //     console.log("web socket opened");
-  //     webSocket.send("ping");
-  //   };
+    webSocket.onopen = () => {
+      console.log("web socket opened");
+      webSocket.send("ping");
+    };
 
-  //   webSocket.onmessage = function(event) {
+    webSocket.onmessage = function(event) {
+      console.log('message recieved')
+      const appointmentData = JSON.parse(event.data);
 
-  //     const appointmentData = JSON.parse(event.data);
-
-  //     if (appointmentData.type === "SET_INTERVIEW") {
+      if (appointmentData.type === "SET_INTERVIEW") {
         
-  //       const id = appointmentData.id;
-  //       const interview = appointmentData.interview;
+        const id = appointmentData.id;
+        const interview = appointmentData.interview;
+        
+        const appointment = {
+          ...state.appointments[id],
+          interview: interview ? {...interview} : null
+        };
 
-  //       const appointment = {
-  //         ...state.appointments[id],
-  //         interview: interview ? {...interview} : null
-  //       };
+        const appointments = {
+          ...state.appointments,
+          [id]: appointment
+        };
 
-  //       const appointments = {
-  //         ...state.appointments,
-  //         [id]: appointment
-  //       };
+        dispatch({type:SET_INTERVIEW, appointments})
+        dispatch({type:UPDATE_SPOTS});
+        
+      }
+    };
 
-  //       dispatch({type:SET_INTERVIEW, appointments});
-  //       dispatch({type:UPDATE_SPOTS});
-  //     }
-  //   };
-
-  //   return ()=>{
-  //     webSocket.close();
-  //   };
-  // },[webSocket,state.appointments]);
+    return ()=>{
+      webSocket.close();
+    };
+  },[webSocket,state.appointments]);
   
 
   function bookInterview(id, interview) {
