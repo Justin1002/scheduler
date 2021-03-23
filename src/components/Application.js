@@ -2,7 +2,11 @@ import React from "react";
 import "components/Application.scss";
 import DayList from "components/DayList";
 import Appointment from "components/Appointment";
-import {getAppointmentsForDay, getInterviewersForDay, getInterview} from "../helpers/selectors.js";
+import {
+  getAppointmentsForDay,
+  getInterviewersForDay,
+  getInterview,
+} from "../helpers/selectors.js";
 import useApplicationData from "hooks/useApplicationData";
 
 export default function Application(props) {
@@ -10,27 +14,29 @@ export default function Application(props) {
     state,
     setDay,
     bookInterview,
-    cancelInterview
+    cancelInterview,
   } = useApplicationData();
 
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
-  console.log(dailyInterviewers[0])
-  const addAppointment = dailyAppointments.map(appointment => {
+
+  const addAppointment = dailyAppointments.map((appointment) => {
     const interview = getInterview(state, appointment.interview);
 
-    return <Appointment 
-      key={appointment.id}
-      {...appointment}
-      interview={interview}
-      interviewer={dailyInterviewers[0].id}
-      interviewers={dailyInterviewers}
-      bookInterview={bookInterview}
-      cancelInterview ={cancelInterview} />;
+    return (
+      <Appointment
+        key={appointment.id}
+        {...appointment}
+        interview={interview}
+        interviewer={dailyInterviewers[0].id}
+        interviewers={dailyInterviewers}
+        bookInterview={bookInterview}
+        cancelInterview={cancelInterview}
+      />
+    );
   });
 
   return (
-  
     <main className="layout">
       <section className="sidebar">
         <img
@@ -40,11 +46,7 @@ export default function Application(props) {
         />
         <hr className="sidebar__separator sidebar--centered" />
         <nav className="sidebar__menu">
-          <DayList
-            days={state.days}
-            day={state.day}
-            setDay={setDay}
-          />
+          <DayList days={state.days} day={state.day} setDay={setDay} />
         </nav>
         <img
           className="sidebar__lhl sidebar--centered"
@@ -55,11 +57,7 @@ export default function Application(props) {
       <section className="schedule">
         {addAppointment}
         <Appointment key="last" time="5pm" />
-
       </section>
     </main>
-  
   );
-  
 }
-

@@ -9,128 +9,114 @@ import reducer, {
 } from "reducers/application";
 
 export default function useApplicationData() {
-
-  const [state,dispatch] = useReducer(reducer, {
+  const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
     days: [],
     appointments: {},
-    interviewers: {}
+    interviewers: {},
   });
 
-
-  const setDay = day => dispatch({type:SET_DAY, day});
+  const setDay = (day) => dispatch({ type: SET_DAY, day });
 
   useEffect(() => {
-    
     Promise.all([
-      axios.get('/api/days'),
-      axios.get('/api/appointments'),
-      axios.get('/api/interviewers')
+      axios.get("/api/days"),
+      axios.get("/api/appointments"),
+      axios.get("/api/interviewers"),
     ]).then((all) => {
-
       const days = all[0].data;
       const appointments = all[1].data;
       const interviewers = all[2].data;
 
       dispatch({
-        type:SET_APPLICATION_DATA,
-        days, appointments, interviewers
+        type: SET_APPLICATION_DATA,
+        days,
+        appointments,
+        interviewers,
       });
     });
-
-  },[]);
+  }, []);
 
   const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
-  
+
   useEffect(() => {
-      
     webSocket.onopen = () => {
-      console.log("web socket opened");
       webSocket.send("ping");
     };
 
-    webSocket.onmessage = function(event) {
-      console.log('message recieved')
+    webSocket.onmessage = function (event) {
       const appointmentData = JSON.parse(event.data);
 
       if (appointmentData.type === "SET_INTERVIEW") {
-        
         const id = appointmentData.id;
         const interview = appointmentData.interview;
-        
+
         const appointment = {
           ...state.appointments[id],
-          interview: interview ? {...interview} : null
+          interview: interview ? { ...interview } : null,
         };
 
         const appointments = {
           ...state.appointments,
-          [id]: appointment
+          [id]: appointment,
         };
 
-        dispatch({type:SET_INTERVIEW, appointments})
-        dispatch({type:UPDATE_SPOTS});
-        
+        dispatch({ type: SET_INTERVIEW, appointments });
+        dispatch({ type: UPDATE_SPOTS });
       }
     };
 
-    return ()=>{
+    return () => {
       webSocket.close();
     };
-  },[webSocket,state.appointments]);
-  
+  }, [webSocket, state.appointments]);
 
   function bookInterview(id, interview) {
-
     const appointment = {
       ...state.appointments[id],
-      interview: { ...interview }
+      interview: { ...interview },
     };
-    console.log('bookinterview_state',state);
+
     const appointments = {
       ...state.appointments,
-      [id]: appointment
+      [id]: appointment,
     };
-    
-    console.log("bookInterview:",appointments);
-    return axios.put(`/api/appointments/${id}`, appointment)
-      .then(res => {
-        dispatch({type: SET_INTERVIEW, appointments});
-        // setState(prev => ({...prev,appointments}));
+
+    return axios
+      .put(`/api/appointments/${id}`, appointment)
+      .then((res) => {
+        dispatch({ type: SET_INTERVIEW, appointments });
+
         return res;
       })
-      .then(res => {
-        dispatch({type: UPDATE_SPOTS});
-        // setState(prev => ({...prev, days:spotsRemaining(prev)}));
+      .then((res) => {
+        dispatch({ type: UPDATE_SPOTS });
       });
-    
   }
 
   function cancelInterview(id) {
-
     const appointment = {
       ...state.appointments[id],
-      interview: null
+      interview: null,
     };
 
     const appointments = {
       ...state.appointments,
-      [id]: appointment
+      [id]: appointment,
     };
 
-    return axios.delete(`/api/appointments/${id}`)
-      .then(res => {
-        dispatch({type: SET_INTERVIEW,appointments});
+    return axios
+      .delete(`/api/appointments/${id}`)
+      .then((res) => {
+        dispatch({ type: SET_INTERVIEW, appointments });
         // setState(prev => ({...prev,appointments}));
         return res;
       })
-      .then(res => {
-        dispatch({type: UPDATE_SPOTS});
+      .then((res) => {
+        dispatch({ type: UPDATE_SPOTS });
         // setState(prev => ({...prev, days:spotsRemaining(prev)}));
       });
-    
   }
 
-  return { state , setDay, bookInterview, cancelInterview };
-
+  return { state, setDay, bookInterview, cancelInterview };
 }
