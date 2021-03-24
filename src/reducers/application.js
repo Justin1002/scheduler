@@ -14,7 +14,7 @@ function spotsRemaining(currentState) {
     //establish initial available spots from day object, and establish currentDay
     count = dayItem.appointments.length;
     currentDay = { ...dayItem };
-    //check which appointments currently do not have an appointment
+    //check which appointments currently have interview scheduled, reduce remaining spots if so
     for (const ID of currentDay.appointments) {
       if (appointmentsCopy[ID].interview !== null) {
         count--;
