@@ -4,11 +4,12 @@ import "components/DayListItem.scss";
 const classNames = require("classnames");
 
 export default function DayListItem(props) {
+  //Determine whether or not the specific day is selected
   const dayClass = classNames("day-list__item", {
     "day-list__item--selected": props.selected,
     "day-list__item--full": props.spots === 0,
   });
-
+  //Function to format text shown for spots remaining
   const formatSpots = function (spots) {
     if (spots === 0) {
       return "no spots remaining";

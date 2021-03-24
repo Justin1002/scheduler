@@ -24,17 +24,19 @@ function spotsRemaining(currentState) {
     currentDay.spots = count;
     daysCopy[currentDay.id - 1] = currentDay;
   }
+  //return the new days array copy
   return daysCopy;
 }
 
 function reducer(state, action) {
   switch (action.type) {
+    //sets the current day state
     case SET_DAY:
       return {
         ...state,
         day: action.day,
       };
-
+    //sets the initial application data from the API server
     case SET_APPLICATION_DATA:
       return {
         ...state,
@@ -42,14 +44,14 @@ function reducer(state, action) {
         appointments: action.appointments,
         interviewers: action.interviewers,
       };
-
+    //Called when an interview is booked or deleted
     case SET_INTERVIEW: {
       return {
         ...state,
         appointments: action.appointments,
       };
     }
-
+    // update spots when an interview is booked or deleted
     case UPDATE_SPOTS: {
       return {
         ...state,

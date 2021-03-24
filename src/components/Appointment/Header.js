@@ -2,6 +2,7 @@ import React from "react";
 
 export default function Header(props) {
   return (
+    //Static header displaying the time of appoointment
     <header className="appointment__time">
       <h4 className="text--semi-bold">{props.time}</h4>
       <hr className="appointment__separator" />

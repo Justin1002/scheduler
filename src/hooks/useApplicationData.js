@@ -1,6 +1,7 @@
 import { useReducer, useEffect } from "react";
 import axios from "axios";
 
+//import reducer function used for managing complex state
 import reducer, {
   SET_DAY,
   SET_APPLICATION_DATA,
@@ -18,6 +19,7 @@ export default function useApplicationData() {
 
   const setDay = (day) => dispatch({ type: SET_DAY, day });
 
+  //useEffect to populate all the data from the api server
   useEffect(() => {
     Promise.all([
       axios.get("/api/days"),
@@ -27,7 +29,7 @@ export default function useApplicationData() {
       const days = all[0].data;
       const appointments = all[1].data;
       const interviewers = all[2].data;
-
+      //update current state with the application data
       dispatch({
         type: SET_APPLICATION_DATA,
         days,
@@ -37,8 +39,10 @@ export default function useApplicationData() {
     });
   }, []);
 
+  //Create a new web-socket
   const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
 
+  //useEffect for the web-socket application component
   useEffect(() => {
     webSocket.onopen = () => {
       webSocket.send("ping");
@@ -46,7 +50,7 @@ export default function useApplicationData() {
 
     webSocket.onmessage = function (event) {
       const appointmentData = JSON.parse(event.data);
-
+      //If an interview is set, update the interviews and spots remaining in state
       if (appointmentData.type === "SET_INTERVIEW") {
         const id = appointmentData.id;
         const interview = appointmentData.interview;
@@ -71,6 +75,7 @@ export default function useApplicationData() {
     };
   }, [webSocket, state.appointments]);
 
+
   function bookInterview(id, interview) {
     const appointment = {
       ...state.appointments[id],
@@ -81,7 +86,7 @@ export default function useApplicationData() {
       ...state.appointments,
       [id]: appointment,
     };
-
+    //once interview is successfully inserted into the database, update the appointment + spots remaining state
     return axios
       .put(`/api/appointments/${id}`, appointment)
       .then((res) => {
@@ -104,7 +109,7 @@ export default function useApplicationData() {
       ...state.appointments,
       [id]: appointment,
     };
-
+    //once interview is successfully removed from the database, update the appointment + spots remaining state
     return axios
       .delete(`/api/appointments/${id}`)
       .then((res) => {

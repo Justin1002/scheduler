@@ -4,6 +4,7 @@ import "components/Button.scss";
 const classNames = require("classnames");
 
 export default function Button(props) {
+  //establish the given button class based on props
   const buttonClass = classNames({
     button: true,
     "button--confirm": props.confirm,

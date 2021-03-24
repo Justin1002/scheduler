@@ -12,11 +12,12 @@ export default function Form(props) {
     setInterviewer(null);
   };
 
+  //When the cancel button is clicked, call the cancel function
   const cancel = function () {
     reset();
     return props.onCancel();
   };
-
+  //Validate that student name is entered, otherwise save the entered name and interviewer
   function validate() {
     if (personName === "") {
       setError("Student name cannot be blank");
@@ -27,6 +28,7 @@ export default function Form(props) {
   }
 
   return (
+  //Edit and add appointment view
     <main className="appointment__card appointment__card--create">
       <section className="appointment__card-left">
         <form autoComplete="off" onSubmit={(event) => event.preventDefault()}>

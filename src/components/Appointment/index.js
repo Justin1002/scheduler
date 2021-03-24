@@ -11,6 +11,7 @@ import Confirm from "./Confirm";
 import Error from "./Error";
 
 export default function Appointment(props) {
+  //Different views related to the appointment component
   const EMPTY = "EMPTY";
   const SHOW = "SHOW";
   const CREATE = "CREATE";
@@ -21,26 +22,31 @@ export default function Appointment(props) {
   const ERROR_SAVE = "ERROR_SAVE";
   const ERROR_DELETE = "ERROR_DELETE";
 
+  //Establish initial appointment view based on whether an interview exists
   const { mode, transition, back } = useVisualMode(
     props.interview ? SHOW : EMPTY
   );
-
+  
+  // when function save button is clicked
   function save(name, interviewer) {
     const interview = {
       student: name,
       interviewer,
     };
+    //transition to saving view
     transition(SAVING);
+    //if book interview is successful, transition to show the appointment otherwise show error message
     props
       .bookInterview(props.id, interview)
       .then((res) => transition(SHOW))
       .catch((err) => transition(ERROR_SAVE, true));
     return;
   }
+  //Show confirmation message prior to deletion
   function confirmDeletion() {
     transition(CONFIRM);
   }
-
+  // If confirmation button is clicked, delete the interview
   function deleteInterview() {
     transition(DELETE, true);
     props
@@ -49,10 +55,12 @@ export default function Appointment(props) {
       .catch((err) => transition(ERROR_DELETE, true));
     return;
   }
+  //Transition to edit view when edit is clicked
   function editInterview() {
     transition(EDIT);
   }
-
+  
+  //Use effect for websocket dynamic rendering, ensuring appropriate view is shown if previous state does not match
   useEffect(() => {
     if (props.interview && mode === EMPTY) {
       transition(SHOW);
@@ -62,7 +70,9 @@ export default function Appointment(props) {
     }
   }, [props.interview, transition, mode]);
 
+  
   return (
+    //Various views for the appointment component
     <article className="appointment" data-testid="appointment">
       <Header time={props.time} />
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}

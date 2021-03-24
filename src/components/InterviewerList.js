@@ -3,7 +3,9 @@ import "components/InterviewerList.scss";
 import InterviewerListItem from "components/InterviewerListItem";
 import PropTypes from "prop-types";
 
+
 function InterviewerList(props) {
+  //Interviewer list which containers all the interviewers
   const interviewer = props.interviewers.map((interviewer) => {
     return (
       <InterviewerListItem
@@ -24,6 +26,7 @@ function InterviewerList(props) {
   );
 }
 
+//Ensure interviewers is an array that exists
 InterviewerList.propTypes = {
   interviewers: PropTypes.array.isRequired,
 };

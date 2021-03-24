@@ -10,6 +10,7 @@ import {
 import useApplicationData from "hooks/useApplicationData";
 
 export default function Application(props) {
+  //Import all state changing functions from the custom hook in useApplicationData
   const {
     state,
     setDay,
@@ -20,6 +21,7 @@ export default function Application(props) {
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
 
+  //Function to render all appointments for the given day
   const addAppointment = dailyAppointments.map((appointment) => {
     const interview = getInterview(state, appointment.interview);
 

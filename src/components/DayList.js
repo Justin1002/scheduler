@@ -2,6 +2,7 @@ import React from "react";
 import DayListItem from "components/DayListItem";
 
 export default function DayList(props) {
+  //Daylist component which contains all the days
   const addDays = props.days.map((day) => {
     return (
       <DayListItem
